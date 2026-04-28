@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: pocketbase-render
+    env: docker
+    repo: https://github.com/Yukyuuu/pocketbase-render
+    branch: main
+    plan: free
+    healthCheckPath: /_/
+    envVars:
+      - key: PORT
+        value: 8090
