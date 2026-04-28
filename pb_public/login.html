@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>用户登录 - 旧书阁</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+.login-box{max-width:400px;margin:50px auto;padding:30px;background:#fff;border-radius:8px;box-shadow:0 0 10px #00000010}
+.tab{display:flex;margin-bottom:20px}
+.tab button{flex:1;padding:10px;border:none;background:#eee;cursor:pointer}
+.tab button.active{background:#1a365d;color:#fff}
+.form-item{margin-bottom:15px}
+label{display:block;margin-bottom:6px}
+input{width:100%;padding:10px;border:1px solid #ddd;border-radius:6px}
+button.submit{background:#1a365d;color:#fff;border:none;padding:12px;width:100%;border-radius:6px;cursor:pointer}
+.panel{display:none}
+.panel.active{display:block}
+</style>
+</head>
+<body>
+<div class="header">
+<div class="logo">旧书阁</div>
+<div class="nav"><a href="index.html">首页</a><a href="list.html">书籍列表</a><a href="login.html">登录/注册</a></div>
+</div>
+
+<div class="login-box">
+<div class="tab">
+<button class="tabbtn active" data-panel="login">登录</button>
+<button class="tabbtn" data-panel="register">注册</button>
+</div>
+
+<!-- 登录 -->
+<div id="login" class="panel active">
+<div class="form-item"><label>邮箱</label><input type="email" id="login_email" required></div>
+<div class="form-item"><label>密码</label><input type="password" id="login_pwd" required></div>
+<button class="submit" onclick="userLogin()">登录</button>
+</div>
+
+<!-- 注册 -->
+<div id="register" class="panel">
+<div class="form-item"><label>邮箱</label><input type="email" id="reg_email" required></div>
+<div class="form-item"><label>密码</label><input type="password" id="reg_pwd" required></div>
+<div class="form-item"><label>确认密码</label><input type="password" id="reg_pwd2" required></div>
+<button class="submit" onclick="userRegister()">注册</button>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.19.0/dist/pocketbase.umd.js"></script>
+<script>
+const pb = new PocketBase('http://127.0.0.1:8090');
+
+// 切换面板
+document.querySelectorAll('.tabbtn').forEach(t=>{
+t.onclick=()=>{
+document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'))
+document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'))
+t.classList.add('active')
+document.getElementById(t.dataset.panel).classList.add('active')
+}})
+
+// 注册
+async function userRegister(){
+let email=document.getElementById('reg_email').value
+let pwd=document.getElementById('reg_pwd').value
+let pwd2=document.getElementById('reg_pwd2').value
+if(pwd!==pwd2){alert('两次密码不一致');return}
+try{
+await pb.collection('users').create({email,emailVisibility:true,password:pwd,passwordConfirm:pwd2})
+alert('注册成功！请登录')
+document.querySelector('.tabbtn[data-panel="login"]').click()
+}catch(e){alert('注册失败：'+e.message)}
+}
+
+// 登录
+async function userLogin(){
+let email=document.getElementById('login_email').value
+let pwd=document.getElementById('login_pwd').value
+try{
+await pb.collection('users').authWithPassword(email,pwd)
+alert('登录成功')
+window.location.href='index.html'
+}catch(e){alert('登录失败：'+e.message)}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>书籍详情 - 旧书阁</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .detail-box {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00000010;
+        }
+        .detail-box img {
+            max-width: 200px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+        .price {
+            font-size: 22px;
+            color: #e53935;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .info {
+            line-height: 1.7;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">旧书阁</div>
+    <div class="nav">
+        <a href="index.html">首页</a>
+        <a href="list.html">书籍列表</a>
+        <a href="publish.html">我要卖书</a>
+        <a href="about.html">关于我们</a>
+    </div>
+</div>
+
+<div class="detail-box">
+    <h2 id="bookTitle">加载中...</h2>
+    <img id="bookImg" src="" alt="封面">
+    <div class="info">作者：<span id="bookAuthor"></span></div>
+    <div class="price">价格：¥<span id="bookPrice"></span></div>
+    <div class="info">描述：<p id="bookDesc"></p></div>
+    <div class="info">联系方式：<span id="bookContact"></span></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.19.0/dist/pocketbase.umd.js"></script>
+<script>
+    const pb = new PocketBase('http://127.0.0.1:8090');
+
+    // 从URL获取书籍ID
+    const params = new URLSearchParams(window.location.search);
+    const bookId = params.get('id');
+
+    async function loadDetail() {
+        if (!bookId) {
+            document.getElementById('bookTitle').innerText = '参数错误';
+            return;
+        }
+        try {
+            const book = await pb.collection('books').getOne(bookId);
+            document.getElementById('bookTitle').innerText = book.title;
+            document.getElementById('bookAuthor').innerText = book.author;
+            document.getElementById('bookPrice').innerText = book.price;
+            document.getElementById('bookDesc').innerText = book.desc;
+            document.getElementById('bookContact').innerText = book.contact;
+
+            if (book.image) {
+                document.getElementById('bookImg').src = pb.files.getUrl(book, book.image);
+            }
+        } catch (err) {
+            document.getElementById('bookTitle').innerText = '加载失败';
+            console.error(err);
+        }
+    }
+
+    loadDetail();
+</script>
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.19.0/dist/pocketbase.umd.js"></script>
+<script>
+const pb = new PocketBase('http://127.0.0.1:8090');
+window.onload = () => {
+    if(pb.authStore.model){
+        document.querySelector('.nav').innerHTML += `<a href="javascript:logout()">退出(${pb.authStore.model.email})</a>`;
+    }else{
+        document.querySelector('.nav').innerHTML += `<a href="login.html">登录/注册</a>`;
+    }
+}
+async function logout(){
+    pb.authStore.clear();
+    alert('已退出');
+    window.location.href='index.html';
+}
+</script>

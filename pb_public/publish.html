@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>发布书籍 - 旧书阁</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .publish-box {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px #00000010;
+        }
+        .form-item {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        button {
+            background: #1a365d;
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">旧书阁</div>
+    <div class="nav">
+        <a href="index.html">首页</a>
+        <a href="list.html">书籍列表</a>
+        <a href="publish.html">我要卖书</a>
+        <a href="about.html">关于我们</a>
+    </div>
+</div>
+
+<div class="publish-box">
+    <h2>发布二手书</h2>
+    <br>
+    <form id="publishForm">
+        <div class="form-item">
+            <label>书名</label>
+            <input type="text" id="title" required>
+        </div>
+        <div class="form-item">
+            <label>作者</label>
+            <input type="text" id="author" required>
+        </div>
+        <div class="form-item">
+            <label>价格（元）</label>
+            <input type="number" id="price" required>
+        </div>
+        <div class="form-item">
+            <label>书籍描述</label>
+            <textarea id="desc" rows="4" required></textarea>
+        </div>
+        <div class="form-item">
+            <label>联系方式</label>
+            <input type="text" id="contact" required>
+        </div>
+        <div class="form-item">
+            <label>封面图片</label>
+            <input type="file" id="image">
+        </div>
+        <button type="submit">提交发布</button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.19.0/dist/pocketbase.umd.js"></script>
+<script>
+const pb = new PocketBase('http://127.0.0.1:8090');
+
+// 未登录跳转到登录页
+if (!pb.authStore.model) {
+    alert('请先登录！');
+    window.location.href = 'login.html';
+}
+
+document.getElementById('publishForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById('title').value;
+    const author = document.getElementById('author').value;
+    const price = document.getElementById('price').value;
+    const desc = document.getElementById('desc').value;
+    const contact = document.getElementById('contact').value;
+    const imageFile = document.getElementById('image').files[0];
+
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('author', author);
+    formData.append('price', price);
+    formData.append('desc', desc);
+    formData.append('contact', contact);
+    formData.append('user', pb.authStore.model.id); // 关键：提交发布人
+    if (imageFile) formData.append('image', imageFile);
+
+    try {
+        await pb.collection('books').create(formData);
+        alert('发布成功！');
+        window.location.href = 'list.html';
+    } catch (err) {
+        console.error(err);
+        alert('发布失败：' + err.message);
+    }
+});
+</script>
+</body>
+</html>

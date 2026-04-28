@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>旧书阁 - 二手书回收平台</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="header">
+  <div class="logo">旧书阁</div>
+  <div class="nav">
+    <a href="index.html">首页</a>
+    <a href="list.html">书籍列表</a>
+    <a href="publish.html">我要卖书</a>
+    <a href="about.html">关于我们</a>
+  </div>
+</div>
+
+<div class="banner">
+  <h1>旧书循环 · 知识传递</h1>
+  <p>专业二手书回收、出售、交换平台</p>
+  <a href="list.html" class="btn">浏览书籍</a>
+</div>
+
+<div class="footer">
+  <p>旧书阁 © 2026 二手书回收网站</p>
+</div>
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.19.0/dist/pocketbase.umd.js"></script>
+<script>
+const pb = new PocketBase('http://127.0.0.1:8090');
+window.onload = () => {
+    if(pb.authStore.model){
+        document.querySelector('.nav').innerHTML += `<a href="javascript:logout()">退出(${pb.authStore.model.email})</a>`;
+    }else{
+        document.querySelector('.nav').innerHTML += `<a href="login.html">登录/注册</a>`;
+    }
+}
+async function logout(){
+    pb.authStore.clear();
+    alert('已退出');
+    window.location.href='index.html';
+}
+</script>

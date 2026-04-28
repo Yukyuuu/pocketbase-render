@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>关于我们 - 旧书阁</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .about-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            line-height: 1.8;
+            font-size: 16px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.08);
+        }
+        .about-container h2 {
+            color: #1a365d;
+            margin-bottom: 20px;
+            border-left: 4px solid #1a365d;
+            padding-left: 12px;
+        }
+        .about-container p {
+            margin-bottom: 16px;
+            text-align: justify;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">旧书阁</div>
+    <div class="nav">
+        <a href="index.html">首页</a>
+        <a href="list.html">书籍列表</a>
+        <a href="publish.html">我要卖书</a>
+        <a href="about.html">关于我们</a>
+    </div>
+</div>
+
+<div class="about-container">
+    <h2>关于旧书阁</h2>
+    <p>旧书阁是一个专注于二手书回收、交易与共享的校园/社区平台，致力于让闲置书籍重新流转，让知识得以延续。</p>
+    <p>我们相信，每一本旧书都有它的价值，每一次交换都是一次知识的传递。平台以“环保、共享、便捷”为理念，为用户提供简单易用的二手书发布、浏览、联系交易功能。</p>
+    
+    <h2>平台宗旨</h2>
+    <p>减少资源浪费，推动绿色阅读，打造安全、高效、免费的二手书交易环境。</p>
+
+    <h2>功能介绍</h2>
+    <p>• 浏览海量二手书信息</p>
+    <p>• 免费发布自己的闲置书籍</p>
+    <p>• 查看详情并直接联系卖家</p>
+    <p>• 支持图片上传与信息管理</p>
+
+    <h2>联系我们</h2>
+    <p>邮箱：book@oldbookge.com</p>
+    <p>宗旨：让旧书有家，让知识远行</p>
+</div>
+
+<div class="footer">
+    <p>旧书阁 © 2026 二手书回收网站 | 课堂实验项目</p>
+</div>
+</body>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.19.0/dist/pocketbase.umd.js"></script>
+<script>
+const pb = new PocketBase('http://127.0.0.1:8090');
+window.onload = () => {
+    if(pb.authStore.model){
+        document.querySelector('.nav').innerHTML += `<a href="javascript:logout()">退出(${pb.authStore.model.email})</a>`;
+    }else{
+        document.querySelector('.nav').innerHTML += `<a href="login.html">登录/注册</a>`;
+    }
+}
+async function logout(){
+    pb.authStore.clear();
+    alert('已退出');
+    window.location.href='index.html';
+}
+</script>
